@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Liquid Component：液态质感原生 Web UI 组件索引。">
+  <title>Liquid Component</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Avenir, "Avenir Next", "Segoe UI", sans-serif;
+      color: #18241e;
+      background: #edf2ed;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      background-image:
+        linear-gradient(rgba(24, 49, 35, .055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(24, 49, 35, .055) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    .shell {
+      width: min(1120px, calc(100% - 40px));
+      margin-inline: auto;
+      padding: clamp(42px, 8vh, 92px) 0 64px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(260px, .65fr);
+      gap: clamp(40px, 8vw, 112px);
+      align-items: end;
+      padding-bottom: clamp(44px, 8vw, 88px);
+    }
+
+    .eyebrow {
+      margin: 0 0 18px;
+      color: #327646;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 760px;
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(46px, 8vw, 94px);
+      font-weight: 400;
+      line-height: .94;
+      letter-spacing: 0;
+    }
+
+    .intro {
+      margin: 0 0 5px;
+      color: #516158;
+      font-size: 16px;
+      line-height: 1.8;
+    }
+
+    .catalog-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 15px 0;
+      border-top: 1px solid rgba(24, 49, 35, .2);
+      border-bottom: 1px solid rgba(24, 49, 35, .2);
+      color: #59675f;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+    }
+
+    .count {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .component-link {
+      display: grid;
+      position: relative;
+      grid-template-columns: minmax(260px, 42%) minmax(0, 1fr) 42px;
+      gap: clamp(24px, 5vw, 68px);
+      align-items: center;
+      min-height: 310px;
+      padding: 34px 0;
+      border-bottom: 1px solid rgba(24, 49, 35, .2);
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .hit-area {
+      position: absolute;
+      z-index: 2;
+      inset: 0;
+    }
+
+    .preview {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      border: 1px solid rgba(24, 49, 35, .16);
+      border-radius: 6px;
+      background: #e2ebe4;
+      box-shadow: 0 18px 45px rgba(26, 58, 38, .1);
+      transition: transform .42s cubic-bezier(.22, 1, .36, 1), box-shadow .42s ease;
+    }
+
+    .preview iframe {
+      width: 200%;
+      height: 200%;
+      border: 0;
+      transform: scale(.5);
+      transform-origin: top left;
+      pointer-events: none;
+    }
+
+    .component-number {
+      margin: 0 0 16px;
+      color: #3a814d;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.4px;
+    }
+
+    h2 {
+      margin: 0 0 16px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(30px, 4vw, 49px);
+      font-weight: 400;
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .description {
+      max-width: 580px;
+      margin: 0;
+      color: #59675f;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 18px;
+      margin-top: 25px;
+      color: #34473c;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .tags span::before {
+      content: "";
+      display: inline-block;
+      width: 5px;
+      height: 5px;
+      margin: 0 8px 2px 0;
+      border-radius: 50%;
+      background: #45bd5c;
+    }
+
+    .arrow {
+      display: grid;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      border: 1px solid rgba(24, 49, 35, .28);
+      border-radius: 50%;
+      font-size: 22px;
+      transition: color .25s ease, background-color .25s ease, transform .35s cubic-bezier(.22, 1, .36, 1);
+    }
+
+    .component-link:hover .preview {
+      transform: translateY(-5px);
+      box-shadow: 0 24px 58px rgba(26, 58, 38, .16);
+    }
+
+    .component-link:hover .arrow {
+      color: #f5f8f4;
+      background: #1f6e3a;
+      transform: translateX(5px);
+    }
+
+    .component-link:focus-within {
+      outline: 3px solid rgba(31, 110, 58, .45);
+      outline-offset: 8px;
+    }
+
+    .hit-area:focus-visible { outline: 0; }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      padding-top: 28px;
+      color: #6b7870;
+      font-size: 12px;
+    }
+
+    @media (max-width: 760px) {
+      .shell { width: min(100% - 28px, 620px); }
+      header { grid-template-columns: 1fr; gap: 28px; }
+      .intro { max-width: 540px; }
+      .component-link {
+        grid-template-columns: 1fr 42px;
+        gap: 28px 16px;
+        padding: 28px 0 32px;
+      }
+      .preview { grid-column: 1 / -1; }
+      .component-copy { align-self: start; }
+      .arrow { align-self: center; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .preview,
+      .arrow { transition-duration: 0s; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <p class="eyebrow">Native Web Components / 2026</p>
+        <h1>Liquid<br>Component</h1>
+      </div>
+      <p class="intro">一个研究液态质感 Web UI 的组件仓库。每个示例都将 HTML、CSS、SVG 滤镜与交互逻辑封装在独立文件中，无需构建即可运行。</p>
+    </header>
+
+    <section aria-labelledby="catalog-title">
+      <div class="catalog-heading">
+        <span id="catalog-title">组件索引</span>
+        <span class="count">01 Component</span>
+      </div>
+
+      <article class="component-link">
+        <a class="hit-area" href="./liquid-glass-switch.html" aria-label="打开 Liquid Glass Switch 组件"></a>
+        <div class="preview" aria-hidden="true">
+          <iframe src="./liquid-glass-switch.html" tabindex="-1" title="Liquid Glass Switch 预览"></iframe>
+        </div>
+        <div class="component-copy">
+          <p class="component-number">01 / SWITCH</p>
+          <h2>Liquid Glass Switch</h2>
+          <p class="description">带背景折射、材质形变和弹簧回弹的双态开关。支持点击、键盘、平滑拖拽与快速甩动，并为 Safari 提供交互态毛玻璃降级。</p>
+          <div class="tags" aria-label="实现技术">
+            <span>SVG Filter</span>
+            <span>Pointer Events</span>
+            <span>Spring Motion</span>
+          </div>
+        </div>
+        <span class="arrow" aria-hidden="true">→</span>
+      </article>
+    </section>
+
+    <footer>
+      <span>Independent HTML experiments</span>
+      <span>Open a component to interact</span>
+    </footer>
+  </main>
+</body>
+</html>

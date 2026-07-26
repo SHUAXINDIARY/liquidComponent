@@ -6,10 +6,10 @@
 
 ## 使用方式
 
-直接使用浏览器打开对应的 HTML 文件即可预览。例如：
+直接使用浏览器打开仓库索引页，再点击对应条目进入组件：
 
 ```bash
-open liquid-glass-switch.html
+open index.html
 ```
 
 也可以通过任意静态文件服务器运行：
@@ -18,7 +18,7 @@ open liquid-glass-switch.html
 npx serve -m http.server 8000
 ```
 
-然后访问 `http://localhost:8000/liquid-glass-switch.html`。
+然后访问 `http://localhost:8000/`。也可以绕过索引页，直接打开任意组件 HTML 文件。
 
 ## 已有组件
 
@@ -117,6 +117,7 @@ position += (target - position) * follow
 ```text
 .
 ├── README.md
+├── index.html
 └── liquid-glass-switch.html
 ```
 
