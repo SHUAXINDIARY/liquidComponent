@@ -24,7 +24,7 @@ python3 -m http.server 8000
 
 | 组件 | 文件 | 交互方式 | 说明 |
 | --- | --- | --- | --- |
-| Liquid Glass Switch | [`liquid-glass-switch.html`](./liquid-glass-switch.html) | 点击、键盘、拖拽、快速甩动 | 带背景折射、材质形变和弹簧回弹的液态玻璃开关 |
+| Liquid Glass Switch | [`liquid-glass-switch.html`](./liquid-glass-switch.html) | 点击、键盘、平滑拖拽、快速甩动 | 带背景折射、材质形变、弹簧回弹及 Safari 毛玻璃降级的液态玻璃开关 |
 
 ## Liquid Glass Switch
 
@@ -35,7 +35,7 @@ Liquid Glass Switch 是一个可交互的双态开关。滑块经过网格背景
 组件支持以下交互和状态：
 
 - 点击开关切换状态。
-- 水平拖拽滑块，并根据释放位置决定最终状态。
+- 水平拖拽滑块，滑块经过平滑跟随后根据释放位置决定最终状态。
 - 快速甩动时根据拖拽速度预测落点，不要求指针必须越过中点。
 - 使用键盘激活原生 `button`，通过 `role="switch"` 和 `aria-checked` 暴露开关语义。
 - 系统启用“减少动态效果”时，跳过位置弹簧动画。
@@ -71,6 +71,8 @@ JavaScript 分别维护滑块位移、运动速度、缩放比例、白色遮罩
 
 释放后，`animateMaterial(false)` 将这些参数恢复。插值采用四次缓出曲线 `1 - (1 - p)^4`，因此变化前段迅速、末段柔和。
 
+在 Safari/WebKit 降级模式下，滑块仍保留相同的缩放和透明度动画，但视觉效果不依赖无法生效的 SVG 折射。交互开始时改为增强普通 `backdrop-filter` 毛玻璃，交互结束后恢复静止样式。
+
 #### 4. 位移动画
 
 滑块吸附到目标位置时没有使用固定的 CSS 位移动画，而是在 `requestAnimationFrame` 中计算近似临界阻尼弹簧：
@@ -87,11 +89,28 @@ position += velocity * deltaTime
 
 组件使用 Pointer Events 统一处理鼠标、触控笔和触摸操作，并通过 Pointer Capture 确保指针移出按钮后仍能继续拖拽。
 
+指针移动时只更新目标位置，`followDragTarget()` 再通过 `requestAnimationFrame` 让滑块以指数插值追向目标：
+
+```text
+follow = 1 - exp(-28 * deltaTime)
+position += (target - position) * follow
+```
+
+这种方式会保留轻微的跟随感，避免滑块逐像素绑定鼠标所产生的生硬移动；插值包含帧间隔，因此在不同刷新率的屏幕上具有接近一致的手感。轨道颜色按照滑块的实际视觉位置同步渐变，而不是直接跟随指针目标。
+
 移动超过 3 像素后才会被识别为拖拽，以区分普通点击。拖拽期间根据滑块进度在关闭色与开启色之间实时插值；释放时将最近的指针速度外推 90 毫秒，以预测滑块落点，再按预测位置是否越过轨道中点决定最终状态。
 
 ### 浏览器兼容性
 
-核心交互使用标准 HTML、CSS、Pointer Events 和 `requestAnimationFrame`。完整折射效果依赖浏览器对 `backdrop-filter: url(...)` 与 SVG 滤镜组合的支持，建议使用较新的 Chromium 浏览器预览。其他浏览器即使能够正常操作开关，也可能只显示白色滑块或呈现不同的滤镜效果。
+核心交互使用标准 HTML、CSS、Pointer Events 和 `requestAnimationFrame`。完整折射效果依赖浏览器对 `backdrop-filter: url(...)` 与 SVG 滤镜组合的支持。
+
+- Chromium：使用完整 SVG 位移贴图、饱和度和高光合成效果。
+- macOS Safari：静止状态与 Chromium 保持一致；按下、拖拽和切换期间使用 `blur(14px) saturate(1.45)` 普通毛玻璃替代 SVG 折射。
+- iPhone 和 iPad 上的 WebKit 浏览器：采用与 Safari 相同的毛玻璃降级方案。
+
+降级模式通过 User Agent 判断 WebKit 环境，并排除桌面 Chromium。静止状态使用不透明白色滑块和 `blur(0)`，因此不会改变原始 UI；只有交互期间滑块透明度降低后，背后的普通毛玻璃才会显现。`blur(0)` 与交互态滤镜之间可以连续插值，避免从 `none` 切换滤镜产生突变。
+
+系统启用“减少动态效果”时，轨道颜色和 Safari 毛玻璃的 CSS 过渡会立即完成，位置弹簧动画也会直接跳到目标状态。
 
 ## 仓库结构
 
