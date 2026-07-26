@@ -4,28 +4,119 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Liquid Glass Switch</title>
+  <script>document.documentElement.classList.toggle('embed', new URLSearchParams(location.search).has('embed'));</script>
   <style>
-    :root { color-scheme: light; font-family: ui-rounded, "SF Pro Rounded", "Segoe UI", sans-serif; }
+    :root {
+      color-scheme: light dark;
+      font: 100%/1.5 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+      --page: #f5f5f7;
+      --surface: rgba(255, 255, 255, .72);
+      --text: #1d1d1f;
+      --secondary: #6e6e73;
+      --tertiary: #86868b;
+      --line: rgba(0, 0, 0, .1);
+      --accent: #238636;
+      --accent-soft: rgba(35, 134, 54, .12);
+      --focus: rgba(0, 113, 227, .52);
+      --shadow: 0 18px 50px rgba(0, 0, 0, .08);
+    }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100vh;
-      display: grid;
-      place-items: center;
-      color: #17211c;
-      background: #eef2ec;
+      min-width: 320px;
+      color: var(--text);
+      background: var(--page);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
     }
-    /* 演示区域：网格背景用于直观看出玻璃滑块造成的折射。 */
+    .topbar {
+      position: sticky;
+      z-index: 10;
+      top: 0;
+      border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--page) 76%, transparent);
+      -webkit-backdrop-filter: blur(20px) saturate(1.5);
+      backdrop-filter: blur(20px) saturate(1.5);
+    }
+    .topbar-inner {
+      width: min(1040px, calc(100% - 48px));
+      height: 52px;
+      margin-inline: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .back-link {
+      display: inline-grid;
+      width: 32px;
+      height: 32px;
+      place-items: center;
+      border-radius: 50%;
+      color: var(--accent);
+      background: var(--accent-soft);
+      font-size: 1.15rem;
+      text-decoration: none;
+      transition: transform .1s ease-out, background-color .2s ease;
+    }
+    .back-link:active { transform: scale(.94); }
+    .back-link:focus-visible { outline: 4px solid var(--focus); outline-offset: 2px; }
+    .brand {
+      color: var(--secondary);
+      font-size: .8125rem;
+      font-weight: 600;
+      letter-spacing: .01em;
+    }
+    .index-count {
+      color: var(--tertiary);
+      font-size: .75rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .page-shell {
+      width: min(1040px, calc(100% - 48px));
+      margin-inline: auto;
+      padding: clamp(48px, 8vw, 86px) 0 56px;
+    }
+    .page-intro {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
+      gap: clamp(32px, 7vw, 88px);
+      align-items: end;
+      margin-bottom: clamp(36px, 6vw, 58px);
+    }
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--accent);
+      font-size: .8125rem;
+      font-weight: 600;
+      letter-spacing: .01em;
+    }
+    h1 {
+      max-width: 680px;
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+      font-size: clamp(2.65rem, 6vw, 4.75rem);
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -.035em;
+    }
+    .summary {
+      margin: 0;
+      color: var(--secondary);
+      font-size: 1rem;
+      line-height: 1.65;
+    }
     .stage {
-      width: min(760px, calc(100vw - 32px));
-      height: min(440px, calc(100vh - 32px));
-      min-height: 320px;
+      width: 100%;
+      height: clamp(390px, 58vw, 560px);
+      min-height: 390px;
       position: relative;
       display: grid;
       place-items: center;
       overflow: hidden;
-      border: 1px solid rgba(20, 35, 27, .14);
-      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, .7);
+      border-radius: 8px;
       color: rgba(14, 35, 23, .08);
       background-image:
         linear-gradient(to right, currentColor 1px, transparent 1px),
@@ -33,18 +124,35 @@
         radial-gradient(120% 100% at 10% 0%, #fbfdf9, #dce7e0);
       background-size: 24px 24px, 24px 24px, 100% 100%;
       background-position: 12px 12px, 12px 12px, 0 0;
-      box-shadow: 0 24px 70px rgba(24, 50, 35, .12);
+      box-shadow: var(--shadow), inset 0 1px rgba(255, 255, 255, .72);
     }
-    .stage::before {
-      content: "REFRACTION FIELD";
+    .stage-meta {
       position: absolute;
-      top: 24px;
-      left: 26px;
-      color: rgba(18, 38, 27, .44);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1.6px;
+      top: 20px;
+      right: 22px;
+      left: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: rgba(18, 38, 27, .55);
+      font-size: .6875rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
     }
+    .state {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .state::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #34c759;
+    }
+    .state.is-off::before { background: #8e8e93; }
     .switch {
       width: 160px;
       height: 67px;
@@ -90,28 +198,83 @@
       -webkit-backdrop-filter: blur(14px) saturate(1.45);
       backdrop-filter: blur(14px) saturate(1.45);
     }
-    .caption {
-      position: absolute;
-      bottom: 18px;
-      left: 50%;
-      transform: translateX(-50%);
-      margin: 0;
-      color: rgba(18, 38, 27, .62);
-      font-size: 12px;
-      white-space: nowrap;
+    .embed .topbar,
+    .embed .page-intro { display: none; }
+    .embed .page-shell { width: 100%; padding: 0; }
+    .embed .stage {
+      min-height: 100vh;
+      height: 100vh;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --page: #101112;
+        --surface: rgba(38, 39, 41, .76);
+        --text: #f5f5f7;
+        --secondary: #a1a1a6;
+        --tertiary: #86868b;
+        --line: rgba(255, 255, 255, .12);
+        --accent: #52d769;
+        --accent-soft: rgba(82, 215, 105, .14);
+        --shadow: 0 22px 58px rgba(0, 0, 0, .32);
+      }
+      .stage { border-color: rgba(255, 255, 255, .1); }
+    }
+    @media (max-width: 680px) {
+      .topbar-inner,
+      .page-shell { width: min(100% - 28px, 620px); }
+      .page-shell { padding-top: 48px; }
+      .page-intro { grid-template-columns: 1fr; gap: 20px; }
+      .stage { height: min(480px, calc(100vh - 230px)); min-height: 360px; }
+      .embed .stage { height: 100vh; min-height: 100vh; }
+    }
+    @media (prefers-reduced-transparency: reduce) {
+      .topbar {
+        background: var(--page);
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+      }
+    }
+    @media (prefers-contrast: more) {
+      .topbar, .stage { border-color: currentColor; }
+      .summary { color: var(--text); }
     }
     @media (prefers-reduced-motion: reduce) {
       .switch,
+      .back-link,
       .backdrop-filter-fallback .thumb { transition-duration: 0s; }
     }
   </style>
 </head>
 <body>
-  <main class="stage">
-    <button class="switch" type="button" role="switch" aria-checked="true" aria-label="液态玻璃开关">
-      <span class="thumb" aria-hidden="true"></span>
-    </button>
-    <p class="caption">点击开关，观察玻璃边缘对网格的折射</p>
+  <nav class="topbar" aria-label="组件导航">
+    <div class="topbar-inner">
+      <a class="back-link" href="./index.html" aria-label="返回组件索引" title="返回组件索引">←</a>
+      <span class="brand">Liquid Component</span>
+      <span class="index-count">01 / 01</span>
+    </div>
+  </nav>
+
+  <main class="page-shell">
+    <header class="page-intro">
+      <div>
+        <p class="eyebrow">Switch · Interactive Material</p>
+        <h1>Liquid Glass Switch</h1>
+      </div>
+      <p class="summary">一个结合实时背景折射、连续拖拽与速度投影的双态开关，在 Safari 中自动降级为交互态毛玻璃。</p>
+    </header>
+
+    <section class="stage" aria-label="Liquid Glass Switch 实时预览">
+      <div class="stage-meta" aria-hidden="true">
+        <span>Live Material</span>
+        <span class="state">On</span>
+      </div>
+      <button class="switch" type="button" role="switch" aria-checked="true" aria-label="液态玻璃开关">
+        <span class="thumb" aria-hidden="true"></span>
+      </button>
+    </section>
   </main>
 
   <svg width="0" height="0" aria-hidden="true" style="position:absolute">
@@ -147,6 +310,7 @@
 
     const control = document.querySelector('.switch');
     const thumb = control.querySelector('.thumb');
+    const stateLabel = document.querySelector('.state');
     const displacement = document.querySelector('#glass-displacement');
     const travel = 57.9;
     let currentX = travel;
@@ -272,6 +436,8 @@
     function settle(on) {
       // 统一提交最终状态，确保无障碍属性、轨道、位置和材质同步收敛。
       control.setAttribute('aria-checked', String(on));
+      stateLabel.textContent = on ? 'On' : 'Off';
+      stateLabel.classList.toggle('is-off', !on);
       control.style.backgroundColor = '';
       animateTo(on ? travel : 0);
       animateMaterial(false);

@@ -7,10 +7,19 @@
   <title>Liquid Component</title>
   <style>
     :root {
-      color-scheme: light;
-      font-family: Avenir, "Avenir Next", "Segoe UI", sans-serif;
-      color: #18241e;
-      background: #edf2ed;
+      color-scheme: light dark;
+      font: 100%/1.5 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+      --page: #f5f5f7;
+      --surface: rgba(255, 255, 255, .72);
+      --surface-solid: #ffffff;
+      --text: #1d1d1f;
+      --secondary: #6e6e73;
+      --tertiary: #86868b;
+      --line: rgba(0, 0, 0, .1);
+      --accent: #238636;
+      --accent-soft: rgba(35, 134, 54, .12);
+      --focus: rgba(0, 113, 227, .52);
+      --shadow: 0 18px 50px rgba(0, 0, 0, .08);
     }
 
     * { box-sizing: border-box; }
@@ -19,50 +28,62 @@
       min-width: 320px;
       min-height: 100vh;
       margin: 0;
-      background-image:
-        linear-gradient(rgba(24, 49, 35, .055) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(24, 49, 35, .055) 1px, transparent 1px);
-      background-size: 28px 28px;
+      color: var(--text);
+      background: var(--page);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
     }
 
     .shell {
-      width: min(1120px, calc(100% - 40px));
+      width: min(1040px, calc(100% - 48px));
       margin-inline: auto;
-      padding: clamp(42px, 8vh, 92px) 0 64px;
+      padding: clamp(32px, 6vh, 64px) 0 48px;
     }
 
     header {
       display: grid;
-      grid-template-columns: minmax(0, 1.35fr) minmax(260px, .65fr);
-      gap: clamp(40px, 8vw, 112px);
-      align-items: end;
-      padding-bottom: clamp(44px, 8vw, 88px);
+      grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
+      gap: clamp(32px, 7vw, 88px);
+      align-items: center;
+      padding: clamp(48px, 9vw, 92px) 0 clamp(54px, 9vw, 96px);
     }
 
     .eyebrow {
-      margin: 0 0 18px;
-      color: #327646;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 1.8px;
-      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 16px;
+      color: var(--accent);
+      font-size: .8125rem;
+      font-weight: 600;
+      letter-spacing: .01em;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #34c759;
+      box-shadow: 0 0 0 4px var(--accent-soft);
     }
 
     h1 {
-      max-width: 760px;
+      max-width: 680px;
       margin: 0;
-      font-family: Georgia, "Times New Roman", serif;
-      font-size: clamp(46px, 8vw, 94px);
-      font-weight: 400;
-      line-height: .94;
-      letter-spacing: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+      font-size: clamp(3rem, 7vw, 5.25rem);
+      font-weight: 700;
+      line-height: .98;
+      letter-spacing: -.035em;
     }
 
     .intro {
-      margin: 0 0 5px;
-      color: #516158;
-      font-size: 16px;
-      line-height: 1.8;
+      margin: 0;
+      color: var(--secondary);
+      font-size: 1.0625rem;
+      line-height: 1.65;
+      letter-spacing: 0;
     }
 
     .catalog-heading {
@@ -70,30 +91,34 @@
       align-items: center;
       justify-content: space-between;
       gap: 20px;
-      padding: 15px 0;
-      border-top: 1px solid rgba(24, 49, 35, .2);
-      border-bottom: 1px solid rgba(24, 49, 35, .2);
-      color: #59675f;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 1.4px;
-      text-transform: uppercase;
+      padding: 0 0 14px;
+      color: var(--secondary);
+      font-size: .8125rem;
+      font-weight: 600;
+      letter-spacing: .01em;
     }
 
     .count {
+      color: var(--tertiary);
       font-variant-numeric: tabular-nums;
     }
 
     .component-link {
       display: grid;
       position: relative;
-      grid-template-columns: minmax(260px, 42%) minmax(0, 1fr) 42px;
-      gap: clamp(24px, 5vw, 68px);
+      grid-template-columns: minmax(280px, 48%) minmax(0, 1fr) 38px;
+      gap: clamp(28px, 5vw, 56px);
       align-items: center;
-      min-height: 310px;
-      padding: 34px 0;
-      border-bottom: 1px solid rgba(24, 49, 35, .2);
+      min-height: 340px;
+      padding: clamp(24px, 4vw, 38px);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, .68);
+      border-radius: 8px;
       color: inherit;
+      background: var(--surface);
+      box-shadow: var(--shadow), inset 0 1px rgba(255, 255, 255, .72);
+      -webkit-backdrop-filter: blur(22px) saturate(1.4);
+      backdrop-filter: blur(22px) saturate(1.4);
       text-decoration: none;
     }
 
@@ -105,13 +130,15 @@
 
     .preview {
       position: relative;
-      aspect-ratio: 16 / 9;
+      aspect-ratio: 16 / 10;
       overflow: hidden;
-      border: 1px solid rgba(24, 49, 35, .16);
-      border-radius: 6px;
-      background: #e2ebe4;
-      box-shadow: 0 18px 45px rgba(26, 58, 38, .1);
-      transition: transform .42s cubic-bezier(.22, 1, .36, 1), box-shadow .42s ease;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #e6eee8;
+      box-shadow: 0 12px 28px rgba(27, 52, 35, .1);
+      transform: scale(1);
+      transition: transform .35s cubic-bezier(.22, 1, .36, 1), box-shadow .35s ease;
+      will-change: transform;
     }
 
     .preview iframe {
@@ -124,75 +151,81 @@
     }
 
     .component-number {
-      margin: 0 0 16px;
-      color: #3a814d;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 1.4px;
+      margin: 0 0 12px;
+      color: var(--accent);
+      font-size: .75rem;
+      font-weight: 600;
+      letter-spacing: .04em;
     }
 
     h2 {
-      margin: 0 0 16px;
-      font-family: Georgia, "Times New Roman", serif;
-      font-size: clamp(30px, 4vw, 49px);
-      font-weight: 400;
-      line-height: 1.05;
-      letter-spacing: 0;
+      margin: 0 0 12px;
+      font-size: clamp(1.75rem, 3.4vw, 2.5rem);
+      font-weight: 650;
+      line-height: 1.08;
+      letter-spacing: -.025em;
     }
 
     .description {
       max-width: 580px;
       margin: 0;
-      color: #59675f;
-      font-size: 15px;
-      line-height: 1.7;
+      color: var(--secondary);
+      font-size: .9375rem;
+      line-height: 1.6;
     }
 
     .tags {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px 18px;
-      margin-top: 25px;
-      color: #34473c;
-      font-size: 12px;
-      font-weight: 700;
+      gap: 8px;
+      margin-top: 22px;
+      color: var(--secondary);
+      font-size: .75rem;
+      font-weight: 500;
     }
 
-    .tags span::before {
-      content: "";
-      display: inline-block;
-      width: 5px;
-      height: 5px;
-      margin: 0 8px 2px 0;
-      border-radius: 50%;
-      background: #45bd5c;
+    .tags span {
+      padding: 5px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(127, 127, 127, .06);
     }
 
     .arrow {
       display: grid;
-      width: 42px;
-      height: 42px;
+      width: 38px;
+      height: 38px;
       place-items: center;
-      border: 1px solid rgba(24, 49, 35, .28);
+      border: 0;
       border-radius: 50%;
-      font-size: 22px;
-      transition: color .25s ease, background-color .25s ease, transform .35s cubic-bezier(.22, 1, .36, 1);
+      color: var(--accent);
+      background: var(--accent-soft);
+      font-size: 1.25rem;
+      transition: color .2s ease, background-color .2s ease, transform .35s cubic-bezier(.22, 1, .36, 1);
+      will-change: transform;
     }
 
-    .component-link:hover .preview {
-      transform: translateY(-5px);
-      box-shadow: 0 24px 58px rgba(26, 58, 38, .16);
+    @media (hover: hover) {
+      .component-link:hover .preview {
+        transform: scale(1.012);
+        box-shadow: 0 18px 38px rgba(27, 52, 35, .14);
+      }
+
+      .component-link:hover .arrow {
+        color: #fff;
+        background: var(--accent);
+        transform: translateX(3px);
+      }
     }
 
-    .component-link:hover .arrow {
-      color: #f5f8f4;
-      background: #1f6e3a;
-      transform: translateX(5px);
+    .component-link:active .preview {
+      transform: scale(.985);
+      transition-duration: .1s;
     }
 
     .component-link:focus-within {
-      outline: 3px solid rgba(31, 110, 58, .45);
-      outline-offset: 8px;
+      outline: 4px solid var(--focus);
+      outline-offset: 4px;
     }
 
     .hit-area:focus-visible { outline: 0; }
@@ -201,28 +234,63 @@
       display: flex;
       justify-content: space-between;
       gap: 24px;
-      padding-top: 28px;
-      color: #6b7870;
-      font-size: 12px;
+      padding: 28px 2px 0;
+      color: var(--tertiary);
+      font-size: .75rem;
     }
 
     @media (max-width: 760px) {
-      .shell { width: min(100% - 28px, 620px); }
-      header { grid-template-columns: 1fr; gap: 28px; }
+      .shell { width: min(100% - 28px, 620px); padding-top: 22px; }
+      header { grid-template-columns: 1fr; gap: 24px; padding: 54px 4px 58px; }
       .intro { max-width: 540px; }
       .component-link {
-        grid-template-columns: 1fr 42px;
-        gap: 28px 16px;
-        padding: 28px 0 32px;
+        grid-template-columns: 1fr 38px;
+        gap: 26px 14px;
+        padding: 18px 18px 24px;
       }
       .preview { grid-column: 1 / -1; }
       .component-copy { align-self: start; }
       .arrow { align-self: center; }
+      footer { flex-direction: column; gap: 4px; }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --page: #101112;
+        --surface: rgba(38, 39, 41, .76);
+        --surface-solid: #262729;
+        --text: #f5f5f7;
+        --secondary: #a1a1a6;
+        --tertiary: #86868b;
+        --line: rgba(255, 255, 255, .12);
+        --accent: #52d769;
+        --accent-soft: rgba(82, 215, 105, .14);
+        --shadow: 0 22px 58px rgba(0, 0, 0, .32);
+      }
+
+      .component-link {
+        border-color: rgba(255, 255, 255, .1);
+        box-shadow: var(--shadow), inset 0 1px rgba(255, 255, 255, .08);
+      }
+    }
+
+    @media (prefers-reduced-transparency: reduce) {
+      .component-link {
+        background: var(--surface-solid);
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+      }
+    }
+
+    @media (prefers-contrast: more) {
+      .component-link { border-color: currentColor; }
+      .description, .intro { color: var(--text); }
     }
 
     @media (prefers-reduced-motion: reduce) {
       .preview,
       .arrow { transition-duration: 0s; }
+      .component-link:active .preview { transform: none; }
     }
   </style>
 </head>
@@ -245,7 +313,7 @@
       <article class="component-link">
         <a class="hit-area" href="./liquid-glass-switch.html" aria-label="打开 Liquid Glass Switch 组件"></a>
         <div class="preview" aria-hidden="true">
-          <iframe src="./liquid-glass-switch.html" tabindex="-1" title="Liquid Glass Switch 预览"></iframe>
+          <iframe src="./liquid-glass-switch.html?embed=1" tabindex="-1" title="Liquid Glass Switch 预览"></iframe>
         </div>
         <div class="component-copy">
           <p class="component-number">01 / SWITCH</p>
