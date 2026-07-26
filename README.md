@@ -15,10 +15,28 @@ open index.html
 也可以通过任意静态文件服务器运行：
 
 ```bash
-npx serve -m http.server 8000
+python3 -m http.server 8000
 ```
 
 然后访问 `http://localhost:8000/`。也可以绕过索引页，直接打开任意组件 HTML 文件。
+
+## 页面与设计系统
+
+`index.html` 是仓库入口，提供仓库说明、组件数量、实时缩略预览和组件跳转。组件详情页与索引页共享同一套 Apple 风格设计语言：
+
+- 使用平台系统字体，并针对标题和正文分别设置字重、字距与行高。
+- 使用统一的页面背景、文字层级、绿色强调色、8 像素圆角和半透明材质。
+- 自动响应浅色与深色模式。
+- 支持 `prefers-reduced-motion`、`prefers-reduced-transparency` 和 `prefers-contrast`。
+- 详情页顶部提供返回组件索引的导航，避免用户进入独立示例后失去上下文。
+
+索引页通过 `iframe` 加载组件的实时预览：
+
+```html
+<iframe src="./liquid-glass-switch.html?embed=1"></iframe>
+```
+
+查询参数 `?embed=1` 会隐藏详情页导航和说明，将演示区域扩展到整个视口。直接打开 `liquid-glass-switch.html` 时则显示完整详情页。
 
 ## 已有组件
 
@@ -38,6 +56,7 @@ Liquid Glass Switch 是一个可交互的双态开关。滑块经过网格背景
 - 水平拖拽滑块，滑块经过平滑跟随后根据释放位置决定最终状态。
 - 快速甩动时根据拖拽速度预测落点，不要求指针必须越过中点。
 - 使用键盘激活原生 `button`，通过 `role="switch"` 和 `aria-checked` 暴露开关语义。
+- 开关最终状态同步显示为 `On` 或 `Off`，同时更新状态指示色。
 - 系统启用“减少动态效果”时，跳过位置弹簧动画。
 - 多点触控时仅跟踪第一个有效指针，避免状态互相覆盖。
 
@@ -45,7 +64,7 @@ Liquid Glass Switch 是一个可交互的双态开关。滑块经过网格背景
 
 #### 1. 结构与状态
 
-组件使用一个带 `role="switch"` 的原生 `button` 作为轨道，内部 `span.thumb` 作为可移动滑块。开关状态保存在 `aria-checked` 中，CSS 根据该属性设置开启和关闭时的轨道颜色与滑块位置。
+组件使用一个带 `role="switch"` 的原生 `button` 作为轨道，内部 `span.thumb` 作为可移动滑块。开关状态保存在 `aria-checked` 中，CSS 根据该属性设置开启和关闭时的轨道颜色与滑块位置。`settle()` 提交最终状态时还会同步详情页中的 `On` / `Off` 标签和指示色。
 
 JavaScript 分别维护滑块位移、运动速度、缩放比例、白色遮罩透明度和滤镜位移强度。视觉状态与指针状态分开保存，因此用户在动画尚未结束时再次按下，组件仍可从当前画面平滑继续。
 
@@ -116,9 +135,11 @@ position += (target - position) * follow
 
 ```text
 .
+├── .agents/
+│   └── skills/                 # 仓库本地设计与动画技能
 ├── README.md
-├── index.html
-└── liquid-glass-switch.html
+├── index.html                  # 仓库入口与组件索引
+└── liquid-glass-switch.html    # 组件详情页及嵌入式预览
 ```
 
 后续新增组件时，保持每个演示文件可独立运行，并同步更新“已有组件”和对应的“实现原理”章节。
