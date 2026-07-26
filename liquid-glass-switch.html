@@ -79,6 +79,17 @@
       pointer-events: none;
     }
     .switch[aria-checked="false"] .thumb { transform: translate(0, -50%) scale(.65); }
+    /* WebKit 暂不支持在 backdrop-filter 中引用 SVG，使用普通毛玻璃降级。 */
+    .backdrop-filter-fallback .thumb {
+      background: rgb(255, 255, 255);
+      -webkit-backdrop-filter: blur(0) saturate(1);
+      backdrop-filter: blur(0) saturate(1);
+      transition: -webkit-backdrop-filter .26s ease, backdrop-filter .26s ease;
+    }
+    .backdrop-filter-fallback .switch.is-material-active .thumb {
+      -webkit-backdrop-filter: blur(14px) saturate(1.45);
+      backdrop-filter: blur(14px) saturate(1.45);
+    }
     .caption {
       position: absolute;
       bottom: 18px;
@@ -89,7 +100,10 @@
       font-size: 12px;
       white-space: nowrap;
     }
-    @media (prefers-reduced-motion: reduce) { .switch { transition-duration: 0s; } }
+    @media (prefers-reduced-motion: reduce) {
+      .switch,
+      .backdrop-filter-fallback .thumb { transition-duration: 0s; }
+    }
   </style>
 </head>
 <body>
@@ -125,6 +139,12 @@
 
   <script>
     // 位移、材质和指针状态分开保存，拖拽中断动画时可以从当前画面继续。
+    const userAgent = navigator.userAgent;
+    const isWebKit = /AppleWebKit/.test(userAgent);
+    const isDesktopChromium = /Chrome|Chromium|Edg|OPR/.test(userAgent) && !/iP(?:ad|hone|od)/.test(userAgent);
+    const useBackdropFallback = isWebKit && !isDesktopChromium;
+    document.documentElement.classList.toggle('backdrop-filter-fallback', useBackdropFallback);
+
     const control = document.querySelector('.switch');
     const thumb = control.querySelector('.thumb');
     const displacement = document.querySelector('#glass-displacement');
@@ -156,11 +176,13 @@
     function animateMaterial(active) {
       // 按下时放大、降低白色遮罩并增强折射；释放后恢复实体滑块质感。
       cancelAnimationFrame(materialFrame);
+      control.classList.toggle('is-material-active', active);
       const fromScale = currentScale;
       const fromAlpha = currentAlpha;
       const fromDisplacement = currentDisplacement;
       const targetScale = active ? 0.9 : 0.65;
-      const targetAlpha = active ? 0.098 : 1;
+      // Safari 交互时保留更多白色底色，以普通毛玻璃代替 SVG 液态折射。
+      const targetAlpha = active ? (useBackdropFallback ? 0.32 : 0.098) : 1;
       const targetDisplacement = active ? 50.08645714048877 : 22.26064761799501;
       const start = performance.now();
       const duration = active ? 260 : 360;
