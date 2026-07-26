@@ -15,7 +15,7 @@ open liquid-glass-switch.html
 也可以通过任意静态文件服务器运行：
 
 ```bash
-python3 -m http.server 8000
+npx serve -m http.server 8000
 ```
 
 然后访问 `http://localhost:8000/liquid-glass-switch.html`。
