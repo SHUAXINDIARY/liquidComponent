@@ -132,6 +132,7 @@
     let currentX = travel;
     let velocity = 0;
     let animationFrame = 0;
+    let dragFrame = 0;
     let materialFrame = 0;
     let previousTime = 0;
     let currentScale = 0.65;
@@ -142,6 +143,7 @@
     let lastPointerX = 0;
     let lastPointerTime = 0;
     let pointerVelocity = 0;
+    let dragTargetX = travel;
     let dragging = false;
 
     function renderThumb() {
@@ -219,6 +221,32 @@
       control.style.backgroundColor = `rgba(${value[0]}, ${value[1]}, ${value[2]}, ${value[3]})`;
     }
 
+    function followDragTarget() {
+      if (dragFrame) return;
+      let lastTime = 0;
+
+      function frame(time) {
+        const dt = lastTime ? Math.min((time - lastTime) / 1000, 1 / 30) : 1 / 60;
+        lastTime = time;
+        // 指数跟随使手感不受刷新率影响，并保留少量惯性感而不产生明显延迟。
+        const follow = 1 - Math.exp(-28 * dt);
+        currentX += (dragTargetX - currentX) * follow;
+        setTrackProgress(currentX / travel);
+        renderThumb();
+
+        if (Math.abs(dragTargetX - currentX) > 0.05 && pointerId !== null) {
+          dragFrame = requestAnimationFrame(frame);
+        } else {
+          currentX = dragTargetX;
+          setTrackProgress(currentX / travel);
+          renderThumb();
+          dragFrame = 0;
+        }
+      }
+
+      dragFrame = requestAnimationFrame(frame);
+    }
+
     function settle(on) {
       // 统一提交最终状态，确保无障碍属性、轨道、位置和材质同步收敛。
       control.setAttribute('aria-checked', String(on));
@@ -234,6 +262,7 @@
       pointerStartX = lastPointerX = event.clientX;
       lastPointerTime = event.timeStamp;
       pointerVelocity = 0;
+      dragTargetX = currentX;
       dragging = false;
       control.setPointerCapture(pointerId);
       cancelAnimationFrame(animationFrame);
@@ -254,9 +283,8 @@
       const rect = control.getBoundingClientRect();
       // 滑块经过缩放且带负外边距，此值是关闭态下其视觉中心相对轨道左边的位置。
       const visualCenterAtZero = 51.0625;
-      currentX = Math.max(0, Math.min(travel, event.clientX - rect.left - visualCenterAtZero));
-      setTrackProgress(currentX / travel);
-      renderThumb();
+      dragTargetX = Math.max(0, Math.min(travel, event.clientX - rect.left - visualCenterAtZero));
+      followDragTarget();
     });
 
     control.addEventListener('pointerup', event => {
@@ -264,15 +292,19 @@
       control.releasePointerCapture(pointerId);
       const wasOn = control.getAttribute('aria-checked') === 'true';
       // 将最近的拖拽速度外推 90ms，让快速甩动即使未过中点也能完成切换。
-      const projected = currentX + pointerVelocity * 90;
+      const projected = dragTargetX + pointerVelocity * 90;
       const next = dragging ? projected >= travel / 2 : !wasOn;
       pointerId = null;
+      cancelAnimationFrame(dragFrame);
+      dragFrame = 0;
       settle(next);
     });
 
     control.addEventListener('pointercancel', event => {
       if (event.pointerId !== pointerId) return;
       pointerId = null;
+      cancelAnimationFrame(dragFrame);
+      dragFrame = 0;
       // 手势被系统取消时不切换状态，只回到操作前的开关位置。
       settle(control.getAttribute('aria-checked') === 'true');
     });
