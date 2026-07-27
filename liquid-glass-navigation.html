@@ -545,6 +545,7 @@
 
     navigation.addEventListener('pointerdown', event => {
       if (event.button !== 0 || event.pointerType === 'mouse' && event.buttons !== 1) return;
+      const pressedTab = event.target.closest('.nav-item');
       navigation.setPointerCapture(event.pointerId);
       cancelAnimationFrame(positionFrame);
       positionFrame = 0;
@@ -554,6 +555,7 @@
         startClientX: event.clientX,
         startX: currentX,
         startIndex: activeIndex,
+        pressedIndex: tabs.indexOf(pressedTab),
         lastClientX: event.clientX,
         lastTime: event.timeStamp,
         velocity: 0,
@@ -589,6 +591,7 @@
     function finishDrag(event, cancelled = false) {
       if (!dragState || event.pointerId !== dragState.pointerId) return;
       const wasMoved = dragState.moved;
+      const pressedIndex = dragState.pressedIndex;
       const releaseVelocity = cancelled ? 0 : dragState.velocity;
       const min = tabPosition(0);
       const max = tabPosition(tabs.length - 1);
@@ -599,7 +602,11 @@
       navigation.classList.remove('is-dragging');
       animateMaterial(false);
 
-      if (wasMoved) {
+      if (!wasMoved && !cancelled && pressedIndex >= 0) {
+        suppressClick = true;
+        requestAnimationFrame(() => { suppressClick = false; });
+        selectTab(pressedIndex);
+      } else if (wasMoved) {
         suppressClick = true;
         requestAnimationFrame(() => { suppressClick = false; });
         if (tabs.includes(document.activeElement)) document.activeElement.blur();
