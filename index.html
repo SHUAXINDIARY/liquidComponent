@@ -122,6 +122,8 @@
       text-decoration: none;
     }
 
+    .component-link + .component-link { margin-top: 16px; }
+
     .hit-area {
       position: absolute;
       z-index: 2;
@@ -307,7 +309,7 @@
     <section aria-labelledby="catalog-title">
       <div class="catalog-heading">
         <span id="catalog-title">组件索引</span>
-        <span class="count">01 Component</span>
+        <span class="count">02 Components</span>
       </div>
 
       <article class="component-link">
@@ -322,6 +324,24 @@
           <div class="tags" aria-label="实现技术">
             <span>SVG Filter</span>
             <span>Pointer Events</span>
+            <span>Spring Motion</span>
+          </div>
+        </div>
+        <span class="arrow" aria-hidden="true">→</span>
+      </article>
+
+      <article class="component-link">
+        <a class="hit-area" href="./liquid-glass-navigation.html" aria-label="打开 Liquid Glass Navigation 组件"></a>
+        <div class="preview" aria-hidden="true">
+          <iframe src="./liquid-glass-navigation.html?embed=1" tabindex="-1" title="Liquid Glass Navigation 预览"></iframe>
+        </div>
+        <div class="component-copy">
+          <p class="component-number">02 / NAVIGATION</p>
+          <h2>Liquid Glass Navigation</h2>
+          <p class="description">带液态玻璃活动指示器的分段导航。按压时改变材质，切换时以可中断的临界阻尼弹簧连接不同视图。</p>
+          <div class="tags" aria-label="实现技术">
+            <span>SVG Filter</span>
+            <span>ARIA Tabs</span>
             <span>Spring Motion</span>
           </div>
         </div>

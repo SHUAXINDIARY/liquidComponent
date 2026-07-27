@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Liquid Glass Navigation</title>
+  <script>document.documentElement.classList.toggle('embed', new URLSearchParams(location.search).has('embed'));</script>
+  <style>
+    :root {
+      color-scheme: light dark;
+      font: 100%/1.5 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+      --page: #f5f5f7;
+      --text: #1d1d1f;
+      --secondary: #6e6e73;
+      --tertiary: #86868b;
+      --line: rgba(0, 0, 0, .1);
+      --accent: #238636;
+      --accent-soft: rgba(35, 134, 54, .12);
+      --focus: rgba(0, 113, 227, .52);
+      --shadow: 0 18px 50px rgba(0, 0, 0, .08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      color: var(--text);
+      background: var(--page);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    .topbar {
+      position: sticky;
+      z-index: 10;
+      top: 0;
+      border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--page) 76%, transparent);
+      -webkit-backdrop-filter: blur(20px) saturate(1.5);
+      backdrop-filter: blur(20px) saturate(1.5);
+    }
+
+    .topbar-inner {
+      width: min(1040px, calc(100% - 48px));
+      height: 52px;
+      margin-inline: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .back-link {
+      display: inline-grid;
+      width: 32px;
+      height: 32px;
+      place-items: center;
+      border-radius: 50%;
+      color: var(--accent);
+      background: var(--accent-soft);
+      font-size: 1.15rem;
+      text-decoration: none;
+      transition: transform .1s ease-out, background-color .2s ease;
+    }
+
+    .back-link:active { transform: scale(.94); }
+    .back-link:focus-visible { outline: 4px solid var(--focus); outline-offset: 2px; }
+
+    .brand {
+      color: var(--secondary);
+      font-size: .8125rem;
+      font-weight: 600;
+      letter-spacing: .01em;
+    }
+
+    .index-count {
+      color: var(--tertiary);
+      font-size: .75rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .page-shell {
+      width: min(1040px, calc(100% - 48px));
+      margin-inline: auto;
+      padding: clamp(48px, 8vw, 86px) 0 56px;
+    }
+
+    .page-intro {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
+      gap: clamp(32px, 7vw, 88px);
+      align-items: end;
+      margin-bottom: clamp(36px, 6vw, 58px);
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--accent);
+      font-size: .8125rem;
+      font-weight: 600;
+      letter-spacing: .01em;
+    }
+
+    h1 {
+      max-width: 760px;
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+      font-size: clamp(2.65rem, 6vw, 4.75rem);
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -.035em;
+    }
+
+    .summary {
+      margin: 0;
+      color: var(--secondary);
+      font-size: 1rem;
+      line-height: 1.65;
+    }
+
+    .stage {
+      width: 100%;
+      height: clamp(420px, 60vw, 570px);
+      min-height: 420px;
+      position: relative;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, .7);
+      border-radius: 8px;
+      color: rgba(14, 35, 23, .08);
+      background-image:
+        linear-gradient(to right, currentColor 1px, transparent 1px),
+        linear-gradient(to bottom, currentColor 1px, transparent 1px),
+        radial-gradient(120% 100% at 10% 0%, #fbfdf9, #dce7e0);
+      background-size: 24px 24px, 24px 24px, 100% 100%;
+      background-position: 12px 12px, 12px 12px, 0 0;
+      box-shadow: var(--shadow), inset 0 1px rgba(255, 255, 255, .72);
+    }
+
+    .stage-meta {
+      position: absolute;
+      top: 20px;
+      right: 22px;
+      left: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: rgba(18, 38, 27, .55);
+      font-size: .6875rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .demo {
+      width: min(620px, calc(100% - 32px));
+      display: grid;
+      justify-items: center;
+      gap: 42px;
+    }
+
+    .content-state {
+      min-height: 118px;
+      text-align: center;
+    }
+
+    .content-kicker {
+      margin: 0 0 8px;
+      color: #27863c;
+      font-size: .75rem;
+      font-weight: 650;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .content-title {
+      margin: 0 0 8px;
+      color: #17211c;
+      font-size: clamp(1.9rem, 5vw, 3rem);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -.03em;
+    }
+
+    .content-description {
+      margin: 0;
+      color: rgba(23, 33, 28, .6);
+      font-size: .875rem;
+      line-height: 1.55;
+    }
+
+    .segmented-nav {
+      width: min(540px, 100%);
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      padding: 6px;
+      border: 1px solid rgba(19, 38, 27, .12);
+      border-radius: 28px;
+      background: rgba(122, 139, 129, .2);
+      box-shadow: inset 0 1px 3px rgba(24, 50, 35, .08);
+      isolation: isolate;
+      touch-action: manipulation;
+    }
+
+    .liquid-indicator {
+      width: calc((100% - 12px) / 4);
+      height: calc(100% - 12px);
+      position: absolute;
+      z-index: 0;
+      top: 6px;
+      left: 6px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, .88);
+      -webkit-backdrop-filter: url(#navigation-glass);
+      backdrop-filter: url(#navigation-glass);
+      box-shadow: 0 3px 14px rgba(24, 50, 35, .12), inset 0 1px rgba(255, 255, 255, .75);
+      transform-origin: center;
+      pointer-events: none;
+      will-change: transform;
+    }
+
+    .backdrop-filter-fallback .liquid-indicator {
+      -webkit-backdrop-filter: blur(10px) saturate(1.25);
+      backdrop-filter: blur(10px) saturate(1.25);
+    }
+
+    .backdrop-filter-fallback .segmented-nav.is-material-active .liquid-indicator {
+      -webkit-backdrop-filter: blur(16px) saturate(1.5);
+      backdrop-filter: blur(16px) saturate(1.5);
+    }
+
+    .nav-item {
+      min-width: 0;
+      height: 44px;
+      position: relative;
+      z-index: 1;
+      padding: 0 8px;
+      border: 0;
+      border-radius: 22px;
+      color: rgba(23, 33, 28, .58);
+      background: transparent;
+      font: inherit;
+      font-size: .875rem;
+      font-weight: 560;
+      letter-spacing: 0;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .nav-item[aria-selected="true"] { color: #17211c; font-weight: 650; }
+    .nav-item:focus-visible { outline: 3px solid rgba(26, 105, 215, .55); outline-offset: -1px; }
+
+    .embed .topbar,
+    .embed .page-intro { display: none; }
+    .embed .page-shell { width: 100%; padding: 0; }
+    .embed .stage {
+      min-height: 100vh;
+      height: 100vh;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --page: #101112;
+        --text: #f5f5f7;
+        --secondary: #a1a1a6;
+        --tertiary: #86868b;
+        --line: rgba(255, 255, 255, .12);
+        --accent: #52d769;
+        --accent-soft: rgba(82, 215, 105, .14);
+        --shadow: 0 22px 58px rgba(0, 0, 0, .32);
+      }
+      .stage { border-color: rgba(255, 255, 255, .1); }
+    }
+
+    @media (max-width: 680px) {
+      .topbar-inner,
+      .page-shell { width: min(100% - 28px, 620px); }
+      .page-shell { padding-top: 48px; }
+      .page-intro { grid-template-columns: 1fr; gap: 20px; }
+      .stage { height: min(500px, calc(100vh - 210px)); min-height: 390px; }
+      .demo { gap: 34px; }
+      .nav-item { height: 42px; padding-inline: 4px; font-size: .8125rem; }
+      .embed .stage { height: 100vh; min-height: 100vh; }
+    }
+
+    @media (prefers-reduced-transparency: reduce) {
+      .topbar { background: var(--page); -webkit-backdrop-filter: none; backdrop-filter: none; }
+      .liquid-indicator { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
+    }
+
+    @media (prefers-contrast: more) {
+      .topbar, .stage, .segmented-nav { border-color: currentColor; }
+      .summary { color: var(--text); }
+      .nav-item { color: #17211c; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .back-link { transition-duration: 0s; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="topbar" aria-label="组件导航">
+    <div class="topbar-inner">
+      <a class="back-link" href="./index.html" aria-label="返回组件索引" title="返回组件索引">←</a>
+      <span class="brand">Liquid Component</span>
+      <span class="index-count">02 / 02</span>
+    </div>
+  </nav>
+
+  <main class="page-shell">
+    <header class="page-intro">
+      <div>
+        <p class="eyebrow">Navigation · Interactive Material</p>
+        <h1>Liquid Glass Navigation</h1>
+      </div>
+      <p class="summary">一个由液态玻璃指示器连接不同视图的分段导航，切换时继承 Switch 的材质变化与弹簧运动。</p>
+    </header>
+
+    <section class="stage" aria-label="Liquid Glass Navigation 实时预览">
+      <div class="stage-meta" aria-hidden="true">
+        <span>Live Material</span>
+        <span>02 · Navigation</span>
+      </div>
+
+      <div class="demo">
+        <div class="content-state" id="navigation-panel" role="tabpanel" aria-live="polite" aria-labelledby="navigation-tab-0">
+          <p class="content-kicker">Overview</p>
+          <h2 class="content-title">概览</h2>
+          <p class="content-description">查看最近的项目与活动摘要</p>
+        </div>
+
+        <div class="segmented-nav" role="tablist" aria-label="示例导航">
+          <span class="liquid-indicator" aria-hidden="true"></span>
+          <button class="nav-item" id="navigation-tab-0" type="button" role="tab" aria-controls="navigation-panel" aria-selected="true" tabindex="0" data-kicker="Overview" data-title="概览" data-description="查看最近的项目与活动摘要">概览</button>
+          <button class="nav-item" id="navigation-tab-1" type="button" role="tab" aria-controls="navigation-panel" aria-selected="false" tabindex="-1" data-kicker="Activity" data-title="动态" data-description="浏览所有组件的最新变化">动态</button>
+          <button class="nav-item" id="navigation-tab-2" type="button" role="tab" aria-controls="navigation-panel" aria-selected="false" tabindex="-1" data-kicker="Saved" data-title="收藏" data-description="回到你保存的设计与实验">收藏</button>
+          <button class="nav-item" id="navigation-tab-3" type="button" role="tab" aria-controls="navigation-panel" aria-selected="false" tabindex="-1" data-kicker="Settings" data-title="设置" data-description="调整组件的显示与交互偏好">设置</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+    <defs>
+      <filter id="navigation-glass" color-interpolation-filters="sRGB">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="0.25" result="blurred-source"/>
+        <feTurbulence type="fractalNoise" baseFrequency="0.012 0.025" numOctaves="2" seed="8" result="texture"/>
+        <feDisplacementMap id="navigation-displacement" in="blurred-source" in2="texture" scale="18"
+          xChannelSelector="R" yChannelSelector="G" result="displaced"/>
+        <feColorMatrix in="displaced" type="saturate" values="2.4" result="saturated"/>
+        <feSpecularLighting in="texture" surfaceScale="2" specularConstant=".22" specularExponent="22"
+          lighting-color="#ffffff" result="specular">
+          <feDistantLight azimuth="225" elevation="55"/>
+        </feSpecularLighting>
+        <feComposite in="specular" in2="displaced" operator="in" result="specular-clipped"/>
+        <feBlend in="specular-clipped" in2="saturated" mode="screen"/>
+      </filter>
+    </defs>
+  </svg>
+
+  <script>
+    const userAgent = navigator.userAgent;
+    const isWebKit = /AppleWebKit/.test(userAgent);
+    const isDesktopChromium = /Chrome|Chromium|Edg|OPR/.test(userAgent) && !/iP(?:ad|hone|od)/.test(userAgent);
+    const useBackdropFallback = isWebKit && !isDesktopChromium;
+    document.documentElement.classList.toggle('backdrop-filter-fallback', useBackdropFallback);
+
+    const navigation = document.querySelector('.segmented-nav');
+    const indicator = document.querySelector('.liquid-indicator');
+    const displacement = document.querySelector('#navigation-displacement');
+    const tabs = [...document.querySelectorAll('.nav-item')];
+    const contentKicker = document.querySelector('.content-kicker');
+    const contentTitle = document.querySelector('.content-title');
+    const contentDescription = document.querySelector('.content-description');
+    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+
+    let activeIndex = 0;
+    let currentX = 0;
+    let targetX = 0;
+    let velocity = 0;
+    let positionFrame = 0;
+    let materialFrame = 0;
+    let previousTime = 0;
+    let currentScale = 1;
+    let currentAlpha = 0.88;
+    let currentDisplacement = 18;
+
+    function tabPosition(index) {
+      return tabs[index].offsetLeft - indicator.offsetLeft;
+    }
+
+    function renderIndicator() {
+      indicator.style.transform = `translateX(${currentX}px) scale(${currentScale})`;
+      indicator.style.backgroundColor = `rgba(255, 255, 255, ${currentAlpha})`;
+      displacement.setAttribute('scale', currentDisplacement);
+    }
+
+    function animateMaterial(active) {
+      cancelAnimationFrame(materialFrame);
+      navigation.classList.toggle('is-material-active', active);
+      const fromScale = currentScale;
+      const fromAlpha = currentAlpha;
+      const fromDisplacement = currentDisplacement;
+      const targetScale = active ? 1.1 : 1;
+      const targetAlpha = active ? (useBackdropFallback ? 0.34 : 0.12) : 0.88;
+      const targetDisplacement = active ? 50 : 18;
+      const start = performance.now();
+      const duration = active ? 220 : 340;
+
+      if (reducedMotion.matches) {
+        currentScale = targetScale;
+        currentAlpha = targetAlpha;
+        currentDisplacement = targetDisplacement;
+        renderIndicator();
+        return;
+      }
+
+      function frame(time) {
+        const progress = Math.min(1, (time - start) / duration);
+        const eased = 1 - Math.pow(1 - progress, 4);
+        currentScale = fromScale + (targetScale - fromScale) * eased;
+        currentAlpha = fromAlpha + (targetAlpha - fromAlpha) * eased;
+        currentDisplacement = fromDisplacement + (targetDisplacement - fromDisplacement) * eased;
+        renderIndicator();
+        if (progress < 1) materialFrame = requestAnimationFrame(frame);
+      }
+
+      materialFrame = requestAnimationFrame(frame);
+    }
+
+    function animateTo(index) {
+      targetX = tabPosition(index);
+      cancelAnimationFrame(positionFrame);
+      previousTime = 0;
+
+      if (reducedMotion.matches) {
+        currentX = targetX;
+        velocity = 0;
+        renderIndicator();
+        return;
+      }
+
+      function step(time) {
+        if (!previousTime) previousTime = time;
+        const dt = Math.min((time - previousTime) / 1000, 1 / 30);
+        previousTime = time;
+        const stiffness = 310;
+        const damping = 32;
+        const acceleration = stiffness * (targetX - currentX) - damping * velocity;
+        velocity += acceleration * dt;
+        currentX += velocity * dt;
+        renderIndicator();
+
+        if (Math.abs(targetX - currentX) > 0.015 || Math.abs(velocity) > 0.015) {
+          positionFrame = requestAnimationFrame(step);
+        } else {
+          currentX = targetX;
+          velocity = 0;
+          renderIndicator();
+        }
+      }
+
+      positionFrame = requestAnimationFrame(step);
+    }
+
+    function selectTab(index, moveFocus = false) {
+      activeIndex = index;
+      tabs.forEach((tab, tabIndex) => {
+        const selected = tabIndex === index;
+        tab.setAttribute('aria-selected', String(selected));
+        tab.tabIndex = selected ? 0 : -1;
+      });
+      const selected = tabs[index];
+      document.querySelector('#navigation-panel').setAttribute('aria-labelledby', selected.id);
+      contentKicker.textContent = selected.dataset.kicker;
+      contentTitle.textContent = selected.dataset.title;
+      contentDescription.textContent = selected.dataset.description;
+      animateTo(index);
+      animateMaterial(false);
+      if (moveFocus) selected.focus();
+    }
+
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('pointerdown', () => animateMaterial(true));
+      tab.addEventListener('pointercancel', () => animateMaterial(false));
+      tab.addEventListener('click', () => selectTab(index));
+      tab.addEventListener('keydown', event => {
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+        event.preventDefault();
+        let nextIndex = activeIndex;
+        if (event.key === 'ArrowLeft') nextIndex = (activeIndex - 1 + tabs.length) % tabs.length;
+        if (event.key === 'ArrowRight') nextIndex = (activeIndex + 1) % tabs.length;
+        if (event.key === 'Home') nextIndex = 0;
+        if (event.key === 'End') nextIndex = tabs.length - 1;
+        selectTab(nextIndex, true);
+      });
+    });
+
+    window.addEventListener('pointerup', () => animateMaterial(false));
+    window.addEventListener('resize', () => {
+      cancelAnimationFrame(positionFrame);
+      currentX = targetX = tabPosition(activeIndex);
+      velocity = 0;
+      renderIndicator();
+    });
+
+    currentX = targetX = tabPosition(activeIndex);
+    renderIndicator();
+  </script>
+</body>
+</html>

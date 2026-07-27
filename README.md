@@ -43,6 +43,24 @@ python3 -m http.server 8000
 | 组件 | 文件 | 交互方式 | 说明 |
 | --- | --- | --- | --- |
 | Liquid Glass Switch | [`liquid-glass-switch.html`](./liquid-glass-switch.html) | 点击、键盘、平滑拖拽、快速甩动 | 带背景折射、材质形变、弹簧回弹及 Safari 毛玻璃降级的液态玻璃开关 |
+| Liquid Glass Navigation | [`liquid-glass-navigation.html`](./liquid-glass-navigation.html) | 点击、键盘方向键 | 使用液态玻璃指示器和可中断弹簧连接不同视图的分段导航 |
+
+## Liquid Glass Navigation
+
+### 组件说明
+
+Liquid Glass Navigation 是一个四项分段导航。活动指示器沿用 Switch 的材质反馈：按下时放大、降低白色遮罩透明度并增强背景位移，提交切换后恢复实体玻璃质感，同时通过临界阻尼弹簧移动到新选项。
+
+组件使用 `tablist`、`tab` 和 `tabpanel` 语义，支持鼠标、触摸以及 `ArrowLeft`、`ArrowRight`、`Home`、`End` 键盘导航。只有当前选项进入 Tab 顺序，切换时同步更新 `aria-selected`、`tabindex` 和面板关联。
+
+### 实现原理
+
+- 活动指示器通过 `backdrop-filter: url(#navigation-glass)` 引用 SVG 滤镜。
+- `feTurbulence` 生成位移纹理，`feDisplacementMap` 扭曲背景，随后叠加饱和度和镜面高光。
+- 位置动画使用与 Switch 相同的刚度 `310`、阻尼 `32` 临界阻尼弹簧，并从当前呈现位置重新定向。
+- 按压材质使用四次缓出插值，在缩放、遮罩透明度和位移强度之间同步变化。
+- Safari/WebKit 使用 `blur()` 与 `saturate()` 普通毛玻璃替代 SVG 背景滤镜。
+- `?embed=1` 会隐藏详情页导航和说明，供仓库索引实时预览使用。
 
 ## Liquid Glass Switch
 
@@ -139,7 +157,8 @@ position += (target - position) * follow
 │   └── skills/                 # 仓库本地设计与动画技能
 ├── README.md
 ├── index.html                  # 仓库入口与组件索引
-└── liquid-glass-switch.html    # 组件详情页及嵌入式预览
+├── liquid-glass-navigation.html # 液态玻璃导航详情页
+└── liquid-glass-switch.html     # 液态玻璃开关详情页
 ```
 
 后续新增组件时，保持每个演示文件可独立运行，并同步更新“已有组件”和对应的“实现原理”章节。
