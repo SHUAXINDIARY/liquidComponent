@@ -43,15 +43,15 @@ python3 -m http.server 8000
 | 组件 | 文件 | 交互方式 | 说明 |
 | --- | --- | --- | --- |
 | Liquid Glass Switch | [`liquid-glass-switch.html`](./liquid-glass-switch.html) | 点击、键盘、平滑拖拽、快速甩动 | 带背景折射、材质形变、弹簧回弹及 Safari 毛玻璃降级的液态玻璃开关 |
-| Liquid Glass Navigation | [`liquid-glass-navigation.html`](./liquid-glass-navigation.html) | 点击、键盘方向键 | 使用液态玻璃指示器和可中断弹簧连接不同视图的分段导航 |
+| Liquid Glass Navigation | [`liquid-glass-navigation.html`](./liquid-glass-navigation.html) | 点击、键盘方向键、连续拖拽、快速甩动 | 使用可直接拖动的液态玻璃指示器和可中断弹簧连接不同视图的分段导航 |
 
 ## Liquid Glass Navigation
 
 ### 组件说明
 
-Liquid Glass Navigation 是一个四项分段导航。活动指示器沿用 Switch 的材质反馈：按下时放大、降低白色遮罩透明度并增强背景位移，提交切换后恢复实体玻璃质感，同时通过临界阻尼弹簧移动到新选项。
+Liquid Glass Navigation 是一个四项分段导航。活动指示器沿用 Switch 的直接操控和材质反馈：按下时放大、降低白色遮罩透明度并增强背景位移；拖动时与指针保持一比一移动；释放后根据位置和速度吸附到目标选项，并恢复实体玻璃质感。
 
-组件使用 `tablist`、`tab` 和 `tabpanel` 语义，支持鼠标、触摸以及 `ArrowLeft`、`ArrowRight`、`Home`、`End` 键盘导航。只有当前选项进入 Tab 顺序，切换时同步更新 `aria-selected`、`tabindex` 和面板关联。
+组件使用 `tablist`、`tab` 和 `tabpanel` 语义，支持鼠标、触控笔、触摸以及 `ArrowLeft`、`ArrowRight`、`Home`、`End` 键盘导航。拖动跨过分段中心时会实时切换内容；只有当前选项进入 Tab 顺序，并同步更新 `aria-selected`、`tabindex` 和面板关联。
 
 ### 实现原理
 
@@ -59,7 +59,13 @@ Liquid Glass Navigation 是一个四项分段导航。活动指示器沿用 Swit
 - `feTurbulence` 生成位移纹理，`feDisplacementMap` 扭曲背景，随后叠加饱和度和镜面高光。
 - 位置动画使用与 Switch 相同的刚度 `310`、阻尼 `32` 临界阻尼弹簧，并从当前呈现位置重新定向。
 - 按压材质使用四次缓出插值，在缩放、遮罩透明度和位移强度之间同步变化。
+- Pointer Events 与 Pointer Capture 统一处理鼠标、触控笔和触摸拖拽，指针离开导航区域后仍可继续操作。
+- 水平移动超过 `6px` 后才进入拖拽状态，以区分普通点击；拖拽提交后会抑制随后的合成 `click`，避免重复切换。
+- 指示器拖动到首尾边界之外时使用渐进阻力函数产生橡皮筋反馈，而不是在边界处突然停止。
+- 释放时使用最近的指针速度投射停止位置，再选择距离投射点最近的分段，并将释放速度交给弹簧继续运动。
+- 导航设置 `touch-action: pan-y`，保留移动端页面的纵向滚动手势，同时接管横向拖拽。
 - Safari/WebKit 使用 `blur()` 与 `saturate()` 普通毛玻璃替代 SVG 背景滤镜。
+- 系统启用“减少动态效果”时，指示器直接到达目标位置，不执行弹簧动画。
 - `?embed=1` 会隐藏详情页导航和说明，供仓库索引实时预览使用。
 
 ## Liquid Glass Switch
